@@ -7,70 +7,76 @@ author:
 format: pdf
 execute: 
   warning: false
+bibliography: refs.bib
 ---
 
-# Introduction
+## Introduction 
 
-The City of Toronto has a target to reach 40% tree canopy cover by 2050, and currently, the city has approximately 28-31% canopy cover and must bridge the roughly 10% gap (City of Toronto, 2025). This project will explore the properties of street tree data sourced from the City of Toronto and evaluate how well-prepared the city is to meet its goal considering risk factors, such as monoculture vulnerability and high mortality rates among small trees.
+Toronto aims to expand its tree canopy cover from its current 28-31% to 40% by 2050 to build climate resilience and mitigate urban heat [@toronto_report_2025]. To evaluate if current planting strategies will actually secure this future canopy, this project analyzes municipal street tree data [@toronto_data_2026] against three foundational indicators of urban forest stability: taxonomic diversity, structural age distribution, and mortality risk. A resilient canopy must avoid monoculture vulnerability by adhering to the 10-20-30 rule, ensuring no single species, genus, or family exceeds 10%, 20%, or 30% of the population [@freiburger2025]. Structurally, sustainable population replacement requires a "youthful" (Type I) distribution—characterized by a "reverse-J" curve where abundant young trees (measured by DBH) are recruited to replace mature losses (see Figure 1) [@morgenroth2020]. However, because young trees face severe mortality risks within their first five years [@hilbert2019], this youthful distribution only translates into a mature canopy if paired with rigorous early stewardship. Identifying these structural and demographic bottlenecks is critical to ensure Toronto’s forestry investments yield a sustainable, long-term canopy rather than a costly cycle of early mortality.
 
-The significance of urban forest diversity and structural stability is well-documented in recent literature, providing a framework to evaluate the City of Toronto’s progress toward its 2050 canopy goals. This study draws on three primary areas of research: taxonomic diversity, diameter at breast height (DBH) distributions, and urban tree mortality.
+## Research Questions
 
-## Taxonomic Diversity (The 10-20-30 Rule)
+By evaluating the combined impacts of taxonomic diversity, size distribution, and early mortality, this project investigates whether Toronto's street tree planting efforts can realistically support the city's goal of 40% canopy cover by 2050. It is hypothesized that despite high planting volumes, a demographic bottleneck caused by harsh roadside conditions leads to disproportionate early mortality among young trees. Consequently, because these trees die before growing large enough to provide meaningful shade, the current street tree population is likely failing to generate the mature growth necessary to achieve the 2050 target.
 
-Urban forests are often less diverse than natural forests, making them more vulnerable to catastrophic losses from pests and diseases (Freiburger et al., 2025). To combat this, practitioners frequently use the 10-20-30 rule, which suggests that a city’s tree population should consist of no more than 10% of any single species, 20% of any genus, or 30% of any family.
+## Dataset description, limitations, and methods
+The primary dataset, "Street Tree Data" from Toronto’s Open Data portal, provides an inventory of predominantly City-owned trees on road allowances. Compiled during Urban Forestry maintenance, the dataset contains over 530,000 records with key variables including DBH_TRUNK, COMMON_NAME, BOTANICAL_NAME, WARD, and geometry. Limitations to account for include the exclusion of private and park trees (which may underestimate overall canopy health), outdated records tied only to active maintenance, and imprecise parcel-level geocoding instead of exact GPS coordinates.
 
-## DBH Distributions
+To evaluate if this population can support Toronto's 2050 canopy target, R will be used to model taxonomic and demographic structure [@rcore2024] . Diversity will be assessed against the 10-20-30 rule using BOTANICAL_NAME. Using DBH_TRUNK as a proxy for age, size distributions for the five most common species will then be analyzed to confirm sustainable "reverse-J" replacement curves and to identify early mortality bottlenecks in low-DBH cohort
 
-The size distribution of a tree population, typically measured by DBH, serves as a vital proxy for age and structural diversity. Morgenroth et al. (2020) categorize urban forest structures into three types: Type I (youthful), Type II (maturing), and Type III (mature). See Figure 1.
-
-![Figure 1: Type I, Type II, and Type III structural distributions (Morgenroth et al., 2020)](images\figure1.jpg){width=50%}
-
-A youthful distribution, characterized by a high proportion of small, young trees, is often considered ideal for population stability as it ensures a "reverse J" curve where young trees are recruited to replace older ones. Understanding where Toronto’s street trees fall on this spectrum is essential for predicting whether the current population can realistically mature into a 40% canopy cover.
-
-## Mortality Risks
-
-The success of canopy expansion efforts is heavily dependent on tree survival, particularly during the first five years after planting (Hilbert et al., 2019). High mortality among small trees can undermine planting initiatives, meaning that a youthful population does not guarantee a future mature canopy unless stewardship and maintenance are prioritized to overcome these early losses.
-
-# Research Questions
-
-Given these three factors—taxonomic diversity, size distribution, and early mortality—this project investigates whether Toronto's street tree planting efforts are truly translating into long-term canopy growth.
-
-Research Question: How do the taxonomic diversity, size distribution, and early mortality rates of Toronto’s street trees impact the feasibility of achieving the city’s 40% canopy target by 2050?
-
-Hypothesis: While Toronto is planting plenty of small trees, most of them are dying young due to harsh roadside conditions before they can grow large enough to contribute to the city's canopy goal. Due to this bottleneck, the current street tree population is likely not on track to hit the 40% canopy target by 2050.
-
-Note that this analysis only looks at street tree data. Because it leaves out trees on private property and in city parks, the city's overall canopy outlook may be healthier than this specific dataset depicts.
+## Exploratory Data Analysis
 
 
-# Dataset description and limitations
+```{r}
+# Load tidyverse library
+library(tidyverse)
+# here library used for reproducible file paths
+library(here) 
 
-The primary dataset for this project, "Street Tree Data," is sourced from the City of Toronto’s Open Data portal. Compiled by Urban Forestry staff during inspections and maintenance, the database provides an inventory of predominantly City-owned trees located on road allowances across Toronto. The dataset is structured as a tabular CSV file containing over 530,000 records. Key variables for this analysis include DBH_TRUNK (Diameter at Breast Height), COMMON_NAME, BOTANICAL_NAME, WARD, and geometry (spatial coordinates).
+# Load the locally saved CSV data 
+tree_data <- read_csv("Street_Tree_Data.csv")
 
-Several limitations inherent to the dataset will be accounted for during analysis. Most notably, this dataset is restricted to street trees; because it excludes trees on private property and in city parks, Toronto's overall canopy outlook may be healthier than this specific municipal subset depicts. Additionally, because the database is immense, records are only updated when Urban Forestry actively works on a tree; consequently, some data may be several years old. Spatially, the geometry variable is geocoded to the parcel address rather than exact GPS tree locations, meaning trees may visually map incorrectly onto private parcels.
+# Removing rows that contain impossible value of DBH 
+clean_trees <- tree_data %>%
+  filter(DBH_TRUNK > 0) %>%
+  drop_na(COMMON_NAME, DBH_TRUNK)
 
-# Methods
-To evaluate if Toronto's street tree population can support the 2050 canopy target, this analysis will use R to model taxonomic vulnerability and demographic structure. To assess diversity against the 10-20-30 rule, species, family, and genus will be derived directly from the BOTANICAL_NAME variable. Second, using trunk diameter (DBH_TRUNK) as a proxy for age, size distributions will be plotted specifically for the five most common species to determine if they exhibit the "reverse-J" curve indicative of sustainable population replacement. Finally, to identify early mortality bottlenecks, the cohort data will be stratified by speciesto locate populations heavily skewed toward low DBH, highlighting specific a tree types caught in a cycle of planting and dying young before contributing to the mature canopy.
+# Creating a histogram to visualize if the DBH distribution contains a reverse J-curve
+ggplot(clean_trees, aes(x = DBH_TRUNK)) +
+  geom_histogram(binwidth = 5, fill = "forestgreen", color = "black", alpha = 0.7) +
+  theme_minimal() +
+  xlim(0, 200) +
+  labs(
+    title = "Distribution of Street Tree Trunk Diameters (DBH)",
+    subtitle = "Checking for a youthful 'reverse-J' population structure in Toronto",
+    x = "Trunk Diameter at Breast Height (DBH in cm)",
+    y = "Number of Trees"
+  )
 
-# Exploratory Data Analysis
+# This graph plots the top 10 most common species to determine monoculture vulnerability
+species_dominance <- clean_trees %>%
+  count(COMMON_NAME) %>%
+  mutate(Percentage = (n / sum(n)) * 100) %>%
+  slice_max(Percentage, n = 10)
 
-
+# This is plotted in a bar chart
+ggplot(species_dominance, aes(x = reorder(COMMON_NAME, Percentage), y = Percentage)) +
+  geom_col(fill = "steelblue", color = "black", alpha = 0.8) +
+  coord_flip() + 
+  theme_minimal() +
+  labs(
+    title = "Top 10 Most Dominant Street Tree Species in Toronto",
+    subtitle = "Evaluating over-reliance on specific species and monoculture vulnerability",
+    x = "Common Name",
+    y = "Percentage of Total Street Tree Population (%)"
+  )
+```
+The exploratory data analysis investigated the structural and taxonomic composition of Toronto's street trees to assess the viability of the 2050 canopy target. Analyzing the diameter at breast height (DBH) reveals a highly skewed, youthful population distribution; while the pronounced "reverse-J" curve demonstrates aggressive recent planting efforts, the precipitous drop-off in tree frequency beyond the 15 cm DBH threshold exposes a severe early-mortality bottleneck. This stark decline suggests that despite high planting volumes, young trees are largely failing to survive harsh roadside conditions long enough to mature and provide meaningful shade. Concurrently, the taxonomic evaluation indicates that the city's street tree population narrowly adheres to the 10-20-30 diversity rule at the species level. The Norway Maple constitutes precisely 10% of the population, sitting precariously at the maximum allowable threshold for a single species, which flags a localized vulnerability to monoculture risks and species-specific pests. 
 
 
 
 
 # References
 
-City of Toronto. (2026, June 4). Street tree data [Data set]. Toronto Open Data. https://open.toronto.ca/dataset/street-tree-data/
-
-City of Toronto. (2025, February 12). Strengthening Toronto's tree canopy: Report on climate resilience and tree equity (Report for Action). Environment, Climate and Forestry
-
-Freiburger, M. R., Murphy-Dunning, C., Doroski, D. A., Ashton, P. M., & Peters, J. D. J. (2025). The 10/20/30 planting rule aligns with traditional plant diversity metrics across spatial scales. Urban Forestry and Urban Greening, 114. https://doi.org/10.1016/j.ufug.2025.129112
-
-Hilbert, D. R., Roman, L. A., Koeser, A. K., Vogt, J., & van Doorn, N. S. (2019). Urban tree mortality: A literature review. Arboriculture and Urban Forestry, 45(5), 167–200. https://doi.org/10.48044/jauf.2019.015
-
-Morgenroth, J., Nowak, D. J., & Koeser, A. K. (2020). DBH Distributions in America’s Urban Forests—An Overview of Structural Diversity. Forests, 11(2), 135. https://doi.org/10.3390/f11020135
-
-R Core Team. (2024). R: A language and environment for statistical computing. R Foundation for Statistical Computing. https://www.R-project.org/
 
 
 
