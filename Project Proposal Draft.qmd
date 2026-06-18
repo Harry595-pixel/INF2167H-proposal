@@ -13,16 +13,6 @@ execute:
 
 The City of Toronto has a target to reach 40% tree canopy cover by 2050, and currently, the city has approximately 28-31% canopy cover and must bridge the roughly 10% gap (City of Toronto, 2025). This project will explore the properties of street tree data sourced from the City of Toronto and evaluate how well-prepared the city is to meet its goal considering risk factors, such as monoculture vulnerability and high mortality rates among small trees.
 
-# Research Questions
-
-This project will aim to answer the following question: does Toronto have enough young trees in its street tree population to realistically expand the canopy by 2050?
-
-While Toronto is planting plenty of small trees, most of them are dying young due to harsh roadside conditions before they can grow large enough to contribute to the city's canopy goal. Due to this bottleneck, the current street tree population is likely not on track to hit the 40% canopy target by 2050.
-
-Note that this analysis only looks at street tree data. Because it leaves out trees on private property and in city parks, the city's overall canopy outlook may be healthier than this specific dataset depicts.
-
-# Relevant Literature
-
 The significance of urban forest diversity and structural stability is well-documented in recent literature, providing a framework to evaluate the City of Toronto’s progress toward its 2050 canopy goals. This study draws on three primary areas of research: taxonomic diversity, diameter at breast height (DBH) distributions, and urban tree mortality.
 
 ## Taxonomic Diversity (The 10-20-30 Rule)
@@ -41,9 +31,32 @@ A youthful distribution, characterized by a high proportion of small, young tree
 
 The success of canopy expansion efforts is heavily dependent on tree survival, particularly during the first five years after planting (Hilbert et al., 2019). High mortality among small trees can undermine planting initiatives, meaning that a youthful population does not guarantee a future mature canopy unless stewardship and maintenance are prioritized to overcome these early losses.
 
-# Dataset & Methods
+# Research Questions
+
+Given these three factors—taxonomic diversity, size distribution, and early mortality—this project investigates whether Toronto's street tree planting efforts are truly translating into long-term canopy growth.
+
+Research Question: How do the taxonomic diversity, size distribution, and early mortality rates of Toronto’s street trees impact the feasibility of achieving the city’s 40% canopy target by 2050?
+
+Hypothesis: While Toronto is planting plenty of small trees, most of them are dying young due to harsh roadside conditions before they can grow large enough to contribute to the city's canopy goal. Due to this bottleneck, the current street tree population is likely not on track to hit the 40% canopy target by 2050.
+
+Note that this analysis only looks at street tree data. Because it leaves out trees on private property and in city parks, the city's overall canopy outlook may be healthier than this specific dataset depicts.
+
+
+# Dataset description and limitations
+
+The primary dataset for this project, "Street Tree Data," is sourced from the City of Toronto’s Open Data portal. Compiled by Urban Forestry staff during inspections and maintenance, the database provides an inventory of predominantly City-owned trees located on road allowances across Toronto. The dataset is structured as a tabular CSV file containing over 530,000 records. Key variables for this analysis include DBH_TRUNK (Diameter at Breast Height), COMMON_NAME, BOTANICAL_NAME, WARD, and geometry (spatial coordinates).
+
+Several limitations inherent to the dataset will be accounted for during analysis. Most notably, this dataset is restricted to street trees; because it excludes trees on private property and in city parks, Toronto's overall canopy outlook may be healthier than this specific municipal subset depicts. Additionally, because the database is immense, records are only updated when Urban Forestry actively works on a tree; consequently, some data may be several years old. Spatially, the geometry variable is geocoded to the parcel address rather than exact GPS tree locations, meaning trees may visually map incorrectly onto private parcels.
+
+# Methods
+To evaluate if Toronto's street tree population can support the 2050 canopy target, this analysis will use R to model taxonomic vulnerability and demographic structure. To assess diversity against the 10-20-30 rule, species, family, and genus will be derived directly from the BOTANICAL_NAME variable. Second, using trunk diameter (DBH_TRUNK) as a proxy for age, size distributions will be plotted specifically for the five most common species to determine if they exhibit the "reverse-J" curve indicative of sustainable population replacement. Finally, to identify early mortality bottlenecks, the cohort data will be stratified by speciesto locate populations heavily skewed toward low DBH, highlighting specific a tree types caught in a cycle of planting and dying young before contributing to the mature canopy.
 
 # Exploratory Data Analysis
+
+
+
+
+
 
 # References
 
