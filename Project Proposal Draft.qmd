@@ -7,21 +7,22 @@ author:
 format: pdf
 execute: 
   warning: false
+bibliography: refs.bib
 ---
 
 # Introduction
 
-The City of Toronto has a target to reach 40% tree canopy cover by 2050, and currently, the city has approximately 28-31% canopy cover and must bridge the roughly 10% gap (City of Toronto, 2025). This project will explore the properties of street tree data sourced from the City of Toronto and evaluate how well-prepared the city is to meet its goal considering risk factors, such as monoculture vulnerability and high mortality rates among small trees.
+The City of Toronto has a target to reach 40% tree canopy cover by 2050, and currently, the city has approximately 28-31% canopy cover and must bridge the roughly 10% gap [@toronto_report_2025]. This project will explore the properties of street tree data sourced from the City of Toronto and evaluate how well-prepared the city is to meet its goal considering risk factors, such as monoculture vulnerability and high mortality rates among small trees [@toronto_data_2026].
 
 The significance of urban forest diversity and structural stability is well-documented in recent literature, providing a framework to evaluate the City of Toronto’s progress toward its 2050 canopy goals. This study draws on three primary areas of research: taxonomic diversity, diameter at breast height (DBH) distributions, and urban tree mortality.
 
 ## Taxonomic Diversity (The 10-20-30 Rule)
 
-Urban forests are often less diverse than natural forests, making them more vulnerable to catastrophic losses from pests and diseases (Freiburger et al., 2025). To combat this, practitioners frequently use the 10-20-30 rule, which suggests that a city’s tree population should consist of no more than 10% of any single species, 20% of any genus, or 30% of any family.
+Urban forests are often less diverse than natural forests, making them more vulnerable to catastrophic losses from pests and diseases [@freiburger2025]. To combat this, practitioners frequently use the 10-20-30 rule, which suggests that a city’s tree population should consist of no more than 10% of any single species, 20% of any genus, or 30% of any family.
 
 ## DBH Distributions
 
-The size distribution of a tree population, typically measured by DBH, serves as a vital proxy for age and structural diversity. Morgenroth et al. (2020) categorize urban forest structures into three types: Type I (youthful), Type II (maturing), and Type III (mature). See Figure 1.
+The size distribution of a tree population, typically measured by DBH, serves as a vital proxy for age and structural diversity. @morgenroth2020 categorize urban forest structures into three types: Type I (youthful), Type II (maturing), and Type III (mature). See Figure 1.
 
 ![Figure 1: Type I, Type II, and Type III structural distributions (Morgenroth et al., 2020)](images\figure1.jpg){width=50%}
 
@@ -29,7 +30,7 @@ A youthful distribution, characterized by a high proportion of small, young tree
 
 ## Mortality Risks
 
-The success of canopy expansion efforts is heavily dependent on tree survival, particularly during the first five years after planting (Hilbert et al., 2019). High mortality among small trees can undermine planting initiatives, meaning that a youthful population does not guarantee a future mature canopy unless stewardship and maintenance are prioritized to overcome these early losses.
+The success of canopy expansion efforts is heavily dependent on tree survival, particularly during the first five years after planting [@hilbert2019]. High mortality among small trees can undermine planting initiatives, meaning that a youthful population does not guarantee a future mature canopy unless stewardship and maintenance are prioritized to overcome these early losses.
 
 # Research Questions
 
@@ -49,7 +50,7 @@ The primary dataset for this project, "Street Tree Data," is sourced from the Ci
 Several limitations inherent to the dataset will be accounted for during analysis. Most notably, this dataset is restricted to street trees; because it excludes trees on private property and in city parks, Toronto's overall canopy outlook may be healthier than this specific municipal subset depicts. Additionally, because the database is immense, records are only updated when Urban Forestry actively works on a tree; consequently, some data may be several years old. Spatially, the geometry variable is geocoded to the parcel address rather than exact GPS tree locations, meaning trees may visually map incorrectly onto private parcels.
 
 # Methods
-To evaluate if Toronto's street tree population can support the 2050 canopy target, this analysis will use R to model taxonomic vulnerability and demographic structure. To assess diversity against the 10-20-30 rule, species, family, and genus will be derived directly from the BOTANICAL_NAME variable. Second, using trunk diameter (DBH_TRUNK) as a proxy for age, size distributions will be plotted specifically for the five most common species to determine if they exhibit the "reverse-J" curve indicative of sustainable population replacement. Finally, to identify early mortality bottlenecks, the cohort data will be stratified by speciesto locate populations heavily skewed toward low DBH, highlighting specific a tree types caught in a cycle of planting and dying young before contributing to the mature canopy.
+To evaluate if Toronto's street tree population can support the 2050 canopy target, this analysis will use R to model taxonomic vulnerability and demographic structure [@rcore2024]. To assess diversity against the 10-20-30 rule, species, family, and genus will be derived directly from the BOTANICAL_NAME variable. Second, using trunk diameter (DBH_TRUNK) as a proxy for age, size distributions will be plotted specifically for the five most common species to determine if they exhibit the "reverse-J" curve indicative of sustainable population replacement. Finally, to identify early mortality bottlenecks, the cohort data will be stratified by speciesto locate populations heavily skewed toward low DBH, highlighting specific a tree types caught in a cycle of planting and dying young before contributing to the mature canopy.
 
 # Exploratory Data Analysis
 
@@ -58,19 +59,9 @@ To evaluate if Toronto's street tree population can support the 2050 canopy targ
 
 
 
+
 # References
 
-City of Toronto. (2026, June 4). Street tree data [Data set]. Toronto Open Data. https://open.toronto.ca/dataset/street-tree-data/
-
-City of Toronto. (2025, February 12). Strengthening Toronto's tree canopy: Report on climate resilience and tree equity (Report for Action). Environment, Climate and Forestry
-
-Freiburger, M. R., Murphy-Dunning, C., Doroski, D. A., Ashton, P. M., & Peters, J. D. J. (2025). The 10/20/30 planting rule aligns with traditional plant diversity metrics across spatial scales. Urban Forestry and Urban Greening, 114. https://doi.org/10.1016/j.ufug.2025.129112
-
-Hilbert, D. R., Roman, L. A., Koeser, A. K., Vogt, J., & van Doorn, N. S. (2019). Urban tree mortality: A literature review. Arboriculture and Urban Forestry, 45(5), 167–200. https://doi.org/10.48044/jauf.2019.015
-
-Morgenroth, J., Nowak, D. J., & Koeser, A. K. (2020). DBH Distributions in America’s Urban Forests—An Overview of Structural Diversity. Forests, 11(2), 135. https://doi.org/10.3390/f11020135
-
-R Core Team. (2024). R: A language and environment for statistical computing. R Foundation for Statistical Computing. https://www.R-project.org/
 
 
 
