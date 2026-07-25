@@ -8,18 +8,11 @@ library(WorldFlora)
 
 #create dataset with only relevant variables from raw_data
 tree_data <- data |>
-  select(STRUCTID, WARD, BOTANICAL_NAME, COMMON_NAME, DBH_TRUNK)
+  select(STRUCTID, WARD, BOTANICAL_NAME, DBH_TRUNK)
 
 #reformat variable names
 tree_data_clean <- tree_data |>
   clean_names()
-
-#create new column for genus name and move to right of botanical_name
-tree_data_clean <- tree_data_clean |>
-  mutate(genus_name = word(botanical_name, 1))
-
-tree_data_clean <- tree_data_clean |>
-  relocate(genus_name, .after = botanical_name)
 
 #create new column for region based on ward and move to right of ward
 tree_data_clean <- tree_data_clean |>
@@ -35,15 +28,15 @@ tree_data_clean <- tree_data_clean |>
 tree_data_clean <- tree_data_clean |>
   relocate(region, .after = ward)
 
-#create new column for family_name based on botanical_name
+#create new columns for species, genus, and family based on botanical_name
 #step 1: load WFO backbone to variable
 #if first time running script, you will need to run download line:
 #WFO.download()
 
-# 1. Open the file picker (select 'classification.csv')
+#Open the file picker (select 'classification.csv')
 wfo_file_path <- file.choose() 
 
-# 2. Read the text file directly (avoids WFO.remember silent failures)
+#Read the text file directly (avoids WFO.remember silent failures)
 message("Loading WFO backbone, please wait ~10 seconds...")
 WFO.data <- read.delim(
   wfo_file_path, 
@@ -69,7 +62,7 @@ cleaned_names <- WFO.prepare(
   spec.full = "botanical_name"
   )
 
-#step 4: Run WFO.match only on the unique names
+#step 4: Run WFO.match only on unique tree names
 matched_results <- WFO.match(
   spec.data = cleaned_names,
   WFO.data = WFO.data,
@@ -78,14 +71,71 @@ matched_results <- WFO.match(
 
 best_unique <- WFO.one(matched_results)
 
-#step 5: Join family name to tree_data_clean dataset
-tree_data_clean <- tree_data_clean |>
-  left_join(
-    best_unique |>
-      select(spec.name, family),
-    by = c("botanical_name" = "spec.name")
-  ) |>
-  rename(family_name = family)
+#step 5: Join species, genus, and family name to tree_data_clean dataset
+taxonomy_extract <- best_unique |>
+  select(
+    botanical_name,
+    species_name = spec.name,
+    family_name = family,
+    genus_name = genus
+  )
 
-unique(tree_data_clean$botanical_name)
-view(best_unique)
+tree_data_clean <- tree_data_clean|>
+  left_join(
+    taxonomy_extracted,
+    by = "botanical_name"
+  )
+
+tree_data_clean <- tree_data_clean |>
+  relocate(species_name, genus_name, family_name, .after = botanical_name)
+
+#Checking missing data from taxonomy categorization
+missing_data <- tree_data_clean |>
+  filter(is.na(species_name) | is.na(genus_name) | is.na(family_name)) |>
+  count(botanical_name, sort = TRUE)
+  
+missing_data
+
+#Fill in missing data for species, genus, and family
+#Assume that botanical_names with count n < 1000 are negligible considering the size of the dataset
+# step 1: Create lookup table for botanical_names with count n > 1000
+lookup_table <- tibble(
+  botanical_name = c(
+    "Acer x freemanii (A. rubrum x saccharinum) 'Autumn Blaze'",
+    "Quercus alba",
+    "Acer x freemanii (A. rubrum x saccharinum) 'Armstrong'",
+    "Magnolia x soulngeana (M. denudata x liliiflora)",
+    "Acer x freemanii (A. rubrum x saccharinum) 'Marmo'",
+    "Acer x freemanii (A. rubrum x saccharinum) 'Celebration'",
+    "Acer x freemanii (A. rubrum x saccharinum) 'Sienna Glen'",
+    "Acer x freemanii (A. rubrum x saccharinum)"
+  ),
+  species_lookup = c(
+    "Acer x freemanii", "Quercus alba", "Acer x freemanii", "Magnolia x soulangeana",
+    "Acer x freemanii", "Acer x freemanii", "Acer x freemanii", "Acer x freemanii"
+  ),
+  genus_lookup = c(
+    "Acer", "Quercus", "Acer", "Magnolia", 
+    "Acer", "Acer", "Acer", "Acer"
+  ),
+  family_lookup = c(
+    "Sapindaceae", "Fagaceae", "Sapindaceae", "Magnoliaceae", 
+    "Sapindaceae", "Sapindaceae", "Sapindaceae", "Sapindaceae"
+  )
+)
+
+# 2. Join and populate missing taxonomy in tree_data_clean
+tree_data_clean <- tree_data_clean |>
+  # Join and fill missing values
+  left_join(lookup_table, by = "botanical_name") |>
+  mutate(
+    species_name = coalesce(species_name, species_lookup),
+    genus_name = coalesce(genus_name, genus_lookup),
+    family_name = coalesce(family_name, family_lookup)
+  ) |>
+  select(-ends_with("_lookup"))
+
+#Check for missing data again
+missing_data <- tree_data_clean |>
+  filter(is.na(species_name) | is.na(genus_name) | is.na(family_name)) |>
+  count(botanical_name, sort = TRUE)
