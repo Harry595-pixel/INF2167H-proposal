@@ -89,7 +89,7 @@ tree_data_clean <- tree_data_clean|>
 tree_data_clean <- tree_data_clean |>
   relocate(species_name, genus_name, family_name, .after = botanical_name)
 
-#Checking missing data from taxonomy categorization
+#Checking missing data in taxonomy categorization
 missing_data <- tree_data_clean |>
   filter(is.na(species_name) | is.na(genus_name) | is.na(family_name)) |>
   count(botanical_name, sort = TRUE)
@@ -124,9 +124,8 @@ lookup_table <- tibble(
   )
 )
 
-# 2. Join and populate missing taxonomy in tree_data_clean
+# 2. Join and populate missing taxonomy
 tree_data_clean <- tree_data_clean |>
-  # Join and fill missing values
   left_join(lookup_table, by = "botanical_name") |>
   mutate(
     species_name = coalesce(species_name, species_lookup),
@@ -139,3 +138,19 @@ tree_data_clean <- tree_data_clean |>
 missing_data <- tree_data_clean |>
   filter(is.na(species_name) | is.na(genus_name) | is.na(family_name)) |>
   count(botanical_name, sort = TRUE)
+
+#Summary of missing data
+tree_data_clean |>
+  summarize(across(everything(), ~ sum(is.na(.))))
+
+#Exclude missing data
+tree_data_clean <- tree_data_clean |>
+  filter(
+    !is.na(species_name), 
+    !is.na(genus_name), 
+    !is.na(family_name), 
+    !is.na(ward), 
+    dbh_trunk > 0
+  )
+
+view(tree_data_clean)
