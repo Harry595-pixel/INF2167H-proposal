@@ -4,6 +4,15 @@ library(tidyverse)
 ward_counts <- tree_data_clean |>
   count(ward, name = "total_trees_ward")
 
+#Add region variable
+ward_metrics <- ward_metrics |>
+  left_join(
+    tree_data_clean |>
+      distinct(ward, region), 
+      by = "ward"
+    ) |>
+  relocate(region, .after = ward)
+
 #Calculate 10-20-30 rule benchmarks per ward
 # A. Species Threshold Check (> 10%)
 species_summary <- tree_data_clean |>
