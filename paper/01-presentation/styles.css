@@ -1,0 +1,7 @@
+/* Target body content while leaving headings (h1, h2, h3, etc.) untouched */
+.reveal p,
+.reveal li,
+.reveal blockquote,
+.reveal table {
+  font-size: 32px; /* Adjust this scale (e.g., 0.75em, 24px, 18pt) as needed */
+}

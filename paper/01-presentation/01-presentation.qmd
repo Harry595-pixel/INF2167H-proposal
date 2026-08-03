@@ -1,0 +1,116 @@
+---
+title: "Toronto Street Tree Population"
+subtitle: "Evaluating the health of City of Toronto's street trees by taxonomy and size"
+date: "August 6, 2026"
+date-format: long
+author: 
+  name: "Jocelyn Cao, Harry Parmar"
+format:
+  revealjs:
+    pdf-separate-fragments: true
+    theme: solarized
+    css: styles.css
+    highlight-style: github
+    slide-number: true
+bibliography: ref.bib
+nocite: |
+  @*
+---
+```{r}
+library(tinytable)
+library(here)
+library(dplyr)
+```
+
+## Background
+
+- City of Toronto Canopy goal
+
+## 10-20-30 Rule
+
+## DBH Distributions
+
+## Research Question
+
+## Data Source
+
+## Methods
+
+- Data cleaning
+
+- Exploratory data analysis
+
+- Linear regression model
+
+## Data Cleaning
+
+- Cleaned variable names using janitor package [@R-janitor]
+
+- Created a new table with only necessary variables
+
+  - Object ID: unique ID of tree
+  
+  - Ward: tree location by geographical district
+  
+  - Botanical name: formal scientific name of tree
+  
+  - DBH: diameter of tree's trunk; indicative of tree's maturity
+  
+## Data Cleaning (Continued)
+
+- Derived new variables based on existing variables:
+
+  - Region based on Ward (e.g., Wards 6, 8, 15, 16, 17, and 18 are considered North York)
+  
+  - Species, genus, and family based on botanical name using classification by WorldFlora package [@WorldFlora2020]
+
+## Exploratory Data Analysis
+
+- Proportion of majority **species** in each ward
+
+- Must be under **0.10** to pass 10-20-30 rule
+
+```{r}
+ward_tab <- readRDS(here("other", "tables", "ward_table.rds"))
+ward_tab@data |> 
+  select(ward, region, max_species_prop, dominant_species) |> 
+  tt() |>
+    style_tt(fontsize = 0.7)
+```
+
+## Exploratory Data Analysis (pt.2)
+
+- Proportion of **majority genus** in each ward
+
+- Must be under **0.20** to pass 10-20-30 rule
+
+```{r}
+ward_tab <- readRDS(here("other", "tables", "ward_table.rds"))
+ward_tab@data |> 
+  select(ward, region, max_genus_prop, dominant_genus) |> 
+  tt() |>
+    style_tt(fontsize = 0.7)
+```
+
+## Exploratory Data Analysis (pt.3)
+
+- Proportion of majority **family** in each ward
+
+- Must be under **0.30** to pass 10-20-30 rule
+
+```{r}
+ward_tab <- readRDS(here("other", "tables", "ward_table.rds"))
+ward_tab@data |> 
+  select(ward, region, max_family_prop, dominant_family) |> 
+  tt() |>
+    style_tt(fontsize = 0.7)
+```
+
+## Linear Regression Model
+
+## Summary
+
+## References
+::: {#refs style="font-size: 0.6em;"}
+:::
+
