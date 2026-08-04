@@ -134,9 +134,13 @@ summary(model_2)
 
 ## Linear Regression Model (pt.2)
 
-- R-squared: 
+- R-squared: 0.5659
 
-- p-value:
+- Adjusted R-squared: 0.5067
+
+- p-value: 0.0003
+
+- Residual standard error: 2.486
 
 ## Linear Regression Model (pt.3)
 
@@ -159,15 +163,45 @@ plot_4 <- readRDS(here("models", "plot_4.rds"))
 plot_4
 ```
 ## Findings
-- Wards that severely breach the 20% genus threshold rely heavily on mature, larger trees
+- Wards that severely breach the 20% genus threshold rely heavily on larger, mature trees
 
-- This reflects historical urban forestry practices, such as over-planting of Acer (Maples), that built large street canopy footprints through a  single genus.
+- This reflects the historical urban forestry practice of over-planting of Acer (Maples).
 
 ## Findings
-- Exceeding the 30% family threshold is associated with significantly smaller average trunk diameters.
 
+- Other genus types have few to no mature trees due to lower survival rates, resulting from harsh weather and road conditions
 
+- Over time, more Acer trees were likely planted because of their known resilience
 
+```{r}
+#| fig-align: center
+
+plot_3 <- readRDS(here("models", "plot_3.rds"))
+plot_3
+```
+
+## Findings
+- Exceeding the 30% family threshold is associated with significantly smaller average trunk diameters
+
+- Acer genus is under the Sapindaceae family
+
+  - How can there be lower average DBH for when the Sapindaceae population increases but higher average DBH for when the Acer family increases?
+
+## Findings
+- Recent mass planting of Sapindaceae trees that are NOT under Acer genus
+
+- Efforts are being made to plant trees outside of the Acer genus, but the 10-20-30 rule is still being broken at the family-level
+
+```{r}
+#| fig-align: center
+
+plot_5 <- readRDS(here("models", "plot_5.rds"))
+plot_5
+```
+## Findings
+- Prediction: Arborists see the potential dangers of planting too many trees of the same type, but they also want to plant trees that have higher survival rates.
+
+- As a result, they plant trees that are adjacent to Acer genus in hopes of having more diversity but similar survival rates.
 
 ## Summary
 

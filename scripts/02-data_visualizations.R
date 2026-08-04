@@ -104,7 +104,7 @@ saveRDS(plot_4, file = here("models", "plot_4.rds"))
 plot_5_family <- tree_data_clean |>
   # Filter to the top 10 most frequent families
   group_by(family_name) |>
-  filter(n() >= sort(table(tree_data_clean$family_name), decreasing = TRUE)[10]) |>
+  filter(n() > 10000) |>
   ungroup() |>
   
   ggplot(aes(x = dbh_trunk, fill = family_name)) +
@@ -118,7 +118,7 @@ plot_5_family <- tree_data_clean |>
   scale_x_continuous(breaks = seq(0, 100, by = 20)) +
   
   labs(
-    title = "Trunk Diameter Distribution Across Toronto's Top 10 Tree Families",
+    title = "Trunk Diameter Distribution Across Top Tree Families",
     x = "Trunk Diameter (DBH in cm)",
     y = "Tree Count"
   ) +
