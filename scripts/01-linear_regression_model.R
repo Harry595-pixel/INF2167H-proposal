@@ -1,5 +1,6 @@
 library(tidyverse)
 library(broom)
+library(here)
 
 #Prepare Ward-Level Continuous Metrics
 #Calculate Shannon Diversity Index (H') per ward
@@ -53,3 +54,8 @@ model_3_shannon <- lm(
 
 summary(model_3_shannon)
 tidy(model_3_shannon, conf.int = TRUE)
+
+view(ward_metrics_refined)
+
+# Save model object to disk
+saveRDS(model_1_concentrations, file = here("models", "model_1.rds"))

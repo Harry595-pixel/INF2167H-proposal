@@ -8,7 +8,8 @@ model_1_tidy <- tidy(model_1_concentrations, conf.int = TRUE) |>
     term_clean = c("Species Concentration", "Genus Concentration", "Family Concentration")
   )
 
-ggplot(model_1_tidy, aes(x = estimate, y = reorder(term_clean, estimate))) +
+plot_1 <- ggplot(
+  model_1_tidy, aes(x = estimate, y = reorder(term_clean, estimate))) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
   geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2, color = "forestgreen", size = 0.8) +
   geom_point(size = 3.5, color = "darkgreen") +
@@ -21,8 +22,11 @@ ggplot(model_1_tidy, aes(x = estimate, y = reorder(term_clean, estimate))) +
   theme_minimal() +
   theme(plot.title = element_text(face = "bold"))
 
+saveRDS(plot_1, file = here("models", "plot_1.rds"))
+
 #Plot 2: Ward Genus Dominance vs. Mean Trunk Size by Region
-ggplot(ward_metrics_refined, aes(x = genus_pct, y = mean_dbh)) +
+plot_2 <- ggplot(
+  ward_metrics_refined, aes(x = genus_pct, y = mean_dbh)) +
   # Points color-coded by region
   geom_point(aes(color = region), size = 3.5, alpha = 0.85) +
   # Single linear regression line for the overall model trend
@@ -42,8 +46,10 @@ ggplot(ward_metrics_refined, aes(x = genus_pct, y = mean_dbh)) +
     plot.title = element_text(face = "bold", size = 13)
   )
 
+saveRDS(plot_2, file = here("models", "plot_2.rds"))
+
 #Plot 3: Size-Class Distribution by Genera
-tree_data_clean |>
+plot_3 <- tree_data_clean |>
   group_by(genus_name) |>
   filter(n() > 10000) |>
   ungroup() |>
@@ -69,4 +75,4 @@ tree_data_clean |>
     panel.spacing = unit(1.3, "lines")
   )
 
-
+saveRDS(plot_3, file = here("models", "plot_3.rds"))

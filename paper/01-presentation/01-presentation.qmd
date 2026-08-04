@@ -20,19 +20,30 @@ nocite: |
 library(tinytable)
 library(here)
 library(dplyr)
+library(broom)
 ```
 
 ## Background
+
+- Harry
 
 - City of Toronto Canopy goal
 
 ## 10-20-30 Rule
 
+- Harry
+
 ## DBH Distributions
+
+- Harry
 
 ## Research Question
 
+- Harry
+
 ## Data Source
+
+- Harry
 
 ## Methods
 
@@ -60,7 +71,7 @@ library(dplyr)
 
 - Derived new variables based on existing variables:
 
-  - Region based on Ward (e.g., Wards 6, 8, 15, 16, 17, and 18 are considered North York)
+  - Region based on ward (e.g., Wards 6, 8, 15, 16, 17, and 18 are considered North York)
   
   - Species, genus, and family based on botanical name using classification by WorldFlora package [@WorldFlora2020]
 
@@ -71,7 +82,7 @@ library(dplyr)
 - Must be under **0.10** to pass 10-20-30 rule
 
 ```{r}
-ward_tab <- readRDS(here("other", "tables", "ward_table.rds"))
+ward_tab <- readRDS(here("models", "ward_table.rds"))
 ward_tab@data |> 
   select(ward, region, max_species_prop, dominant_species) |> 
   tt() |>
@@ -85,7 +96,7 @@ ward_tab@data |>
 - Must be under **0.20** to pass 10-20-30 rule
 
 ```{r}
-ward_tab <- readRDS(here("other", "tables", "ward_table.rds"))
+ward_tab <- readRDS(here("models", "ward_table.rds"))
 ward_tab@data |> 
   select(ward, region, max_genus_prop, dominant_genus) |> 
   tt() |>
@@ -99,14 +110,53 @@ ward_tab@data |>
 - Must be under **0.30** to pass 10-20-30 rule
 
 ```{r}
-ward_tab <- readRDS(here("other", "tables", "ward_table.rds"))
+ward_tab <- readRDS(here("models", "ward_table.rds"))
 ward_tab@data |> 
   select(ward, region, max_family_prop, dominant_family) |> 
   tt() |>
     style_tt(fontsize = 0.7)
 ```
 
-## Linear Regression Model
+## Linear Regression Model {.smaller}
+
+- Is there a relationship between tree type (species, genus, family) and maturity (dbh)?
+
+```r{}
+model_1_concentrations <- lm(mean_dbh ~ species_pct + genus_pct + family_pct, 
+  data = ward_metrics_refined)
+```
+
+```{r}
+model_1 <- readRDS(here("models", "model_1.rds"))
+summary(model_1)
+```
+
+## Linear Regression Model (pt.2)
+
+```{r}
+model_1 <- readRDS(here("models", "model_1.rds"))
+tidy(model_1) |> 
+  tt() |> 
+  style_tt(fontsize = 0.75)
+```
+
+- p-value must be less than 0.05 to be statistically significant
+
+- for every 1 percentage point increase in the **top genus** concentration, the average ward trunk diameter increases by ~1.55 cm
+
+- for every 1 percentage point increase in **top species** concentration, the average ward trunk diameter decreases by ~0.48 cm
+
+## Linear Regression Model (pt.3)
+
+```{r}
+plot_1 <- readRDS(here("models", "plot_1.rds"))
+plot_1
+```
+## Linear Regression Model (pt.4)
+```{r}
+plot_3 <- readRDS(here("models", "plot_3.rds"))
+plot_3
+```
 
 ## Summary
 

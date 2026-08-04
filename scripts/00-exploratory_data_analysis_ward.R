@@ -1,4 +1,6 @@
 library(tidyverse)
+library(tinytable)
+library(here)
 
 #Trees per ward
 ward_counts <- tree_data_clean |>
@@ -83,3 +85,10 @@ ward_metrics <- ward_metrics |>
   relocate(region, .after = ward)
 
 view(ward_metrics)
+
+#Create table for presentation and report
+ward_table <- tt(head(ward_metrics, 10)) |> 
+  style_tt(i = 1, bg = "lightgray")
+
+# Save the finished table object to disk
+saveRDS(ward_table, file = here("models", "ward_table.rds"))
