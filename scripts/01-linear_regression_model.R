@@ -2,17 +2,8 @@ library(tidyverse)
 library(broom)
 library(here)
 
-#Prepare Ward-Level Continuous Metrics
-#Calculate Shannon Diversity Index (H') per ward
-ward_shannon <- tree_data_clean |>
-  count(ward, species_name) |>
-  group_by(ward) |>
-  mutate(p = n / sum(n)) |>
-  summarize(shannon_index = -sum(p * log(p)))
-
 #Rescale proportions to percentages (0-100%) and calculate excess violations
 ward_metrics_refined <- ward_metrics |>
-  left_join(ward_shannon, by = "ward") |>
   mutate(
     #Rescale to percentages for readable beta coefficients
     species_pct = max_species_prop * 100,
@@ -45,17 +36,6 @@ model_2_excess <- lm(
 summary(model_2_excess)
 tidy(model_2_excess, conf.int = TRUE)
 
-#Model 3: Overall Taxonomic Diversity (Shannon Index)
-#Predict Ward Mean DBH using continuous species evenness/richness
-model_3_shannon <- lm(
-  mean_dbh ~ shannon_index, 
-  data = ward_metrics_refined
-)
-
-summary(model_3_shannon)
-tidy(model_3_shannon, conf.int = TRUE)
-
-view(ward_metrics_refined)
-
 # Save model object to disk
 saveRDS(model_1_concentrations, file = here("models", "model_1.rds"))
+saveRDS(model_2_excess, file = here("models", "model_2.rds"))

@@ -82,7 +82,7 @@ taxonomy_extract <- best_unique |>
 
 tree_data_clean <- tree_data_clean|>
   left_join(
-    taxonomy_extracted,
+    taxonomy_extract,
     by = "botanical_name"
   )
 
@@ -154,3 +154,5 @@ tree_data_clean <- tree_data_clean |>
   )
 
 view(tree_data_clean)
+
+saveRDS(tree_data_clean, file = here("models", "tree_data_clean.rds"))

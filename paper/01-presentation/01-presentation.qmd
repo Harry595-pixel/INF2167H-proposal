@@ -91,7 +91,7 @@ ward_tab@data |>
 
 ## Exploratory Data Analysis (pt.2)
 
-- Proportion of **majority genus** in each ward
+- Proportion of majority **genus** in each ward
 
 - Must be under **0.20** to pass 10-20-30 rule
 
@@ -117,46 +117,57 @@ ward_tab@data |>
     style_tt(fontsize = 0.7)
 ```
 
+
 ## Linear Regression Model {.smaller}
 
-- Is there a relationship between tree type (species, genus, family) and maturity (dbh)?
+- Is there a relationship between the excess percentage of majority tree type (species, genus, family) and mean ward trunk diameter (dbh)?
 
 ```r{}
-model_1_concentrations <- lm(mean_dbh ~ species_pct + genus_pct + family_pct, 
+model_2_excess <- lm(mean_dbh ~ species_excess + genus_excess + family_excess, 
   data = ward_metrics_refined)
 ```
 
 ```{r}
-model_1 <- readRDS(here("models", "model_1.rds"))
-summary(model_1)
+model_2 <- readRDS(here("models", "model_2.rds"))
+summary(model_2)
 ```
 
 ## Linear Regression Model (pt.2)
 
+- R-squared: 
+
+- p-value:
+
+## Linear Regression Model (pt.3)
+
 ```{r}
-model_1 <- readRDS(here("models", "model_1.rds"))
-tidy(model_1) |> 
+model_2 <- readRDS(here("models", "model_2.rds"))
+tidy(model_2) |> 
   tt() |> 
   style_tt(fontsize = 0.75)
 ```
 
 - p-value must be less than 0.05 to be statistically significant
 
-- for every 1 percentage point increase in the **top genus** concentration, the average ward trunk diameter increases by ~1.55 cm
+- for every 1 percentage point a ward exceeds the **20% genus threshold**, the average trunk diameter **increases by 0.90 cm**
 
-- for every 1 percentage point increase in **top species** concentration, the average ward trunk diameter decreases by ~0.48 cm
+- for every 1 percentage point a ward exceeds the **30% family threshold**, the average trunk diameter **decreases by ~2.03 cm**
 
-## Linear Regression Model (pt.3)
-
-```{r}
-plot_1 <- readRDS(here("models", "plot_1.rds"))
-plot_1
-```
 ## Linear Regression Model (pt.4)
 ```{r}
-plot_3 <- readRDS(here("models", "plot_3.rds"))
-plot_3
+plot_4 <- readRDS(here("models", "plot_4.rds"))
+plot_4
 ```
+## Findings
+- Wards that severely breach the 20% genus threshold rely heavily on mature, larger trees
+
+- This reflects historical urban forestry practices, such as over-planting of Acer (Maples), that built large street canopy footprints through a  single genus.
+
+## Findings
+- Exceeding the 30% family threshold is associated with significantly smaller average trunk diameters.
+
+
+
 
 ## Summary
 
