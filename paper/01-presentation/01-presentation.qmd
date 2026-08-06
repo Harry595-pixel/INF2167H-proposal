@@ -25,25 +25,21 @@ library(broom)
 
 ## Background
 
-- Harry
+- Toronto's Goal: Expanding the urban canopy to 40% by 2050 to improve climate resilience.
+- Monoculture Risk Avoiding over-reliance on single tree types
+- Utilizing the 10-20-30 rule to ensure taxonomic diversity across species, genus, and family.
+- Trunk diameter (DBH) as a proxy for measuring tree maturity.
 
-- City of Toronto Canopy goal
 
-## 10-20-30 Rule
 
-- Harry
+## Evaluating Sustainable Development
 
-## DBH Distributions
+- Research Objective: Investigating the interaction between taxonomic diversity and tree maturity (DBH) at the ward level.
 
-- Harry
+- Using municipal street tree data from Open Data Toronto to assess the structural integrity of Toronto's canopy.
 
-## Research Question
+- Determining if current vulnerabilities stem from historical legacy monocultures or modern planting trends.
 
-- Harry
-
-## Data Source
-
-- Harry
 
 ## Methods
 
@@ -204,6 +200,11 @@ plot_5
 - As a result, they plant trees that are adjacent to Acer genus in hopes of having more diversity but similar survival rates.
 
 ## Summary
+
+- Aging canopy reflects a historical over-reliance on resilient Acer mass-plantings.
+- Modern diversification efforts rely on Sapindaceae alternatives, repeating family-level monoculture risks.
+- True resilience demands prioritizing taxonomic diversity beyond the Sapindaceae family.
+
 
 ## References
 ::: {#refs style="font-size: 0.6em;"}
