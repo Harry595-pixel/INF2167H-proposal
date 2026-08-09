@@ -1,5 +1,54 @@
 ---
-title: "final_project_group5"
-format: html
+title: "Evaluating the health of City of Toronto's street trees by taxonomy and size"
+subtitle: "INF2167 - R for Data Science"
+author:
+  - "Jocelyn Cao"
+  - "Harry Parmar"
+format: pdf
+execute: 
+  warning: false
+bibliography: ref.bib
 ---
 
+# Abstract
+
+# Introduction
+
+# Relevant Literature
+
+# Dataset & Methods
+
+## Dataset Source
+
+The street tree dataset used for this project is sourced from Toronto Open Data [@toronto_data_2026], a publicly available data initiative maintained by the City of Toronto. This dataset was published by City of Toronto's Parks, Forestry, and Recreation division initially on December 1, 2011 and was last updated on June 4, 2026.
+
+The original dataset contains 16 variables, focusing on unique IDs, geographic location, tree type, and tree size. There is a total of 688,335 rows in the dataset.
+
+## Data Cleaning
+
+A new dataset variable was created, called tree_data. This dataset only contains variables that were necessary for this project, including:
+
+- OBJECTID, a unique ID of each tree;
+- WARD, the tree's location by geographical district;
+- BOTANICAL_NAME, the tree's formal scientific name;and
+- DBH_TRUNK, the tree's diameter at breast height.
+
+Another new dataset was created, called tree_data_clean. The janitor package [@R-janitor] was used to clean up the variables names in the dataset so that names were in a consistent snake case format. A new "region" variable was created based on the existing "ward" variable by categorizing wards by region. For example, the trees in Wards 6, 8, 15, 16, 17, and 18 were categorized as being located in North York.
+
+One of the focuses for this project is the 10-20-30 rule which requires the classification of the trees by species, genus, and family. Though species and genus may be inferred for some trees based on botanical name (e.g., if the botanical name is Acer Platanoides, the species is Acer Platanoides and the genus is Acer), the tree's family name must be identified using an external source. Thus, the World Flora Online (WFO) package [WorldFlora2020] was used to create the variables, species_name, genus_name, and family_name, based on the existing variable, botanical name. To optimize runtime, a new variable, called unique_trees, was created to identify all unique botanical names in the tree_data_clean dataset. This table had a total of 304 unique tree names. By running the WFO package's classification function on the unique_trees table instead of the tree_data_clean dataset, the function had to match 304 unique botanical names, rather than attempting to match names for each of the 688,335 tree entries individually.
+
+After the botanical names in unique_trees were classified (as the variable, taxonomy_extract), new variables in the tree_data_clean dataset were created for species_name, genus_name, and family_name. The left_join() function [@Wickham2019] was used to join the species, genus, and family names by the botanical_name variable present in both datasets. The results of the WFO matching were checked for missing values, and there were a total of 18 botanical names that the classification step was unable to classify.
+
+(show missing data table here)
+
+The missing data was resolved manually by identifying the species, genus, and family names for botanical names that appear more than 1000 times in the tree_data_clean dataset. Missing classifications for botanical names with less than 1000 trees were considered insignificant. Manual identification was used for Acer x freemanii, Quercus alba, and Magnolia x soulngeana. Acer x freemanii made up a significant portion of Toronto's street tree population with a total of 21,171 trees.
+
+## Methods
+
+
+
+# Results & Findings
+
+# Discussion & Conclusion
+
+# References

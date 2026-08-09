@@ -135,7 +135,7 @@ tree_data_clean <- tree_data_clean |>
   select(-ends_with("_lookup"))
 
 #Check for missing data again
-missing_data <- tree_data_clean |>
+missing_data_2 <- tree_data_clean |>
   filter(is.na(species_name) | is.na(genus_name) | is.na(family_name)) |>
   count(botanical_name, sort = TRUE)
 
@@ -154,5 +154,7 @@ tree_data_clean <- tree_data_clean |>
   )
 
 view(tree_data_clean)
+
+view(unique_trees)
 
 saveRDS(tree_data_clean, file = here("models", "tree_data_clean.rds"))
