@@ -14,20 +14,6 @@ tree_data <- data |>
 tree_data_clean <- tree_data |>
   clean_names()
 
-#create new column for region based on ward and move to right of ward
-tree_data_clean <- tree_data_clean |>
-  mutate(
-    region = case_when(
-      ward %in% c("01", "02", "03", "04", "05", "07") ~ "Etobicoke York",
-      ward %in% c("06", "08", "15", "16", "17", "18") ~ "North York",
-      ward %in% c("09", "10", "11", "12", "13", "14", "19") ~ "Toronto/East York",
-      ward %in% c("20", "21", "22", "23", "24", "25") ~ "Scarborough",
-      TRUE ~ "Unknown"
-    ))
-
-tree_data_clean <- tree_data_clean |>
-  relocate(region, .after = ward)
-
 #create new columns for species, genus, and family based on botanical_name
 #step 1: load WFO backbone to variable
 #if first time running script, you will need to run download line:
@@ -96,6 +82,8 @@ missing_data <- tree_data_clean |>
   
 missing_data
 
+saveRDS(missing_data, file = here("models", "missing_data.rds"))
+
 #Fill in missing data for species, genus, and family
 #Assume that botanical_names with count n < 1000 are negligible considering the size of the dataset
 # step 1: Create lookup table for botanical_names with count n > 1000
@@ -154,7 +142,5 @@ tree_data_clean <- tree_data_clean |>
   )
 
 view(tree_data_clean)
-
-view(unique_trees)
 
 saveRDS(tree_data_clean, file = here("models", "tree_data_clean.rds"))

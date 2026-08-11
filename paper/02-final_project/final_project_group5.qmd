@@ -8,7 +8,19 @@ format: pdf
 execute: 
   warning: false
 bibliography: ref.bib
+nocite: |
+  @*
 ---
+
+```{r}
+#| echo: false
+library(tinytable)
+library(here)
+library(dplyr)
+library(broom)
+library(knitr)
+library(kableExtra)
+```
 
 # Abstract
 
@@ -35,19 +47,116 @@ A new dataset variable was created, called tree_data. This dataset only contains
 
 Another new dataset was created, called tree_data_clean. The janitor package [@R-janitor] was used to clean up the variables names in the dataset so that names were in a consistent snake case format. A new "region" variable was created based on the existing "ward" variable by categorizing wards by region. For example, the trees in Wards 6, 8, 15, 16, 17, and 18 were categorized as being located in North York.
 
-One of the focuses for this project is the 10-20-30 rule which requires the classification of the trees by species, genus, and family. Though species and genus may be inferred for some trees based on botanical name (e.g., if the botanical name is Acer Platanoides, the species is Acer Platanoides and the genus is Acer), the tree's family name must be identified using an external source. Thus, the World Flora Online (WFO) package [WorldFlora2020] was used to create the variables, species_name, genus_name, and family_name, based on the existing variable, botanical name. To optimize runtime, a new variable, called unique_trees, was created to identify all unique botanical names in the tree_data_clean dataset. This table had a total of 304 unique tree names. By running the WFO package's classification function on the unique_trees table instead of the tree_data_clean dataset, the function had to match 304 unique botanical names, rather than attempting to match names for each of the 688,335 tree entries individually.
+One of the focuses for this project is the 10-20-30 rule which requires the classification of the trees by species, genus, and family. Though species and genus may be inferred for some trees based on botanical name (e.g., if the botanical name is Acer Platanoides, the species is Acer Platanoides and the genus is Acer), the tree's family name must be identified using an external source. Thus, the World Flora Online (WFO) package [WorldFlora2020] was used to create the variables, species_name, genus_name, and family_name, based on the existing variable, botanical name. To optimize runtime, a new variable, called unique_trees, was created to identify all unique botanical names in the tree_data_clean dataset. This table had a total of 304 unique tree names. By running the WFO package's classification function on the unique_trees table instead of the tree_data_clean dataset, the function had to match 304 unique botanical names instead of matching names for each of the 688,335 tree entries individually, saving processing power and optimizing time efficiency.
 
 After the botanical names in unique_trees were classified (as the variable, taxonomy_extract), new variables in the tree_data_clean dataset were created for species_name, genus_name, and family_name. The left_join() function [@Wickham2019] was used to join the species, genus, and family names by the botanical_name variable present in both datasets. The results of the WFO matching were checked for missing values, and there were a total of 18 botanical names that the classification step was unable to classify.
 
-(show missing data table here)
+```{r}
+#| echo: false
+missing_data_tab <- readRDS(here::here("models", "missing_data.rds"))
+missing_data_tab |> 
+  kbl(booktabs = TRUE, longtable = TRUE) |> 
+  kable_styling(
+    latex_options = c("striped", "repeat_header"),
+    font_size = 8
+  )
+```
 
 The missing data was resolved manually by identifying the species, genus, and family names for botanical names that appear more than 1000 times in the tree_data_clean dataset. Missing classifications for botanical names with less than 1000 trees were considered insignificant. Manual identification was used for Acer x freemanii, Quercus alba, and Magnolia x soulngeana. Acer x freemanii made up a significant portion of Toronto's street tree population with a total of 21,171 trees.
 
 ## Methods
 
-
+Exploratory data analysis was conducted to evaluate ward-level compliance to the 10-20-30 rule. Linear regression modelling was then used to investigate the relationship between the 10-20-30 rule compliance and trunk size (DBH) distributions in wards.
 
 # Results & Findings
+
+## Exploratory Data Analysis
+
+```{r}
+#| echo: false
+ward_data <- readRDS(here::here("models", "ward_table.rds"))@data
+ward_data |> 
+  select(-total_trees_ward, -mean_dbh, -median_dbh, -sd_dbh) |>
+  kbl(booktabs = TRUE, longtable = TRUE) |> 
+  kable_styling(
+    latex_options = c("striped", "repeat_header"),
+    font_size = 8
+  ) |> 
+  row_spec(0:nrow(ward_data), extra_latex_after = "\\addlinespace[4pt]") |>
+  column_spec(1, width = "0.8cm") |>
+  column_spec(2:8, width = "1.6cm")
+```
+
+
+```{r}
+#| echo: false
+ward_data <- readRDS(here::here("models", "ward_table.rds"))@data
+ward_data |> 
+  select(ward, ward_name, total_trees_ward, mean_dbh, median_dbh, sd_dbh) |>
+  kbl(booktabs = TRUE, longtable = TRUE) |> 
+  kable_styling(
+    latex_options = c("striped", "repeat_header"),
+    font_size = 8
+  ) |> 
+  row_spec(0:nrow(ward_data), extra_latex_after = "\\addlinespace[4pt]") |>
+  column_spec(1, width = "0.8cm") |>
+  column_spec(2:3, width = "3cm") |>
+  column_spec(4:6, width = "2cm")
+```
+
+## Linear Regression Modelling
+
+```{r}
+#| fig-align: center
+#| fig.width: 6
+#| fig.height: 2.5
+#| echo: false
+plot_1 <- readRDS(here("models", "plot_1.rds"))
+plot_1
+```
+
+```{r}
+#| fig-align: center
+#| fig.width: 5.5
+#| fig.height: 2.5
+#| echo: false
+plot_4 <- readRDS(here("models", "plot_4.rds"))
+plot_4
+```
+```{r}
+#| echo: false
+
+comp_tab <- readRDS(here::here("models", "model_comparison.rds"))
+comp_tab |> 
+  kbl(
+    booktabs = TRUE, 
+    col.names = c("Metric", "Model 1", "Model 2")
+  ) |> 
+  kable_styling(
+    latex_options = c("striped", "hold_position"), 
+    font_size = 9
+  )
+```
+
+```{r}
+#| fig-align: center
+#| fig.width: 8
+#| fig.height: 8
+#| echo: false
+
+plot_3 <- readRDS(here("models", "plot_3.rds"))
+plot_3
+```
+
+```{r}
+#| fig-align: center
+#| fig.width: 8
+#| fig.height: 8
+#| echo: false
+
+plot_5 <- readRDS(here("models", "plot_5.rds"))
+plot_5
+```
 
 # Discussion & Conclusion
 

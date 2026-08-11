@@ -1,7 +1,7 @@
 library(tidyverse)
 library(broom)
 
-#Plot 1: Coefficient Estimate Plot
+#Plot 1: Coefficient Estimate Plot for Model 1
 model_1_tidy <- tidy(model_1_concentrations, conf.int = TRUE) |>
   filter(term != "(Intercept)") |>
   mutate(
@@ -15,7 +15,6 @@ plot_1 <- ggplot(
   geom_point(size = 3.5, color = "darkgreen") +
   labs(
     title = "Model 1 Regression Coefficients",
-    subtitle = "Positive genus effect vs. negative species effect",
     x = "Effect on Mean Ward Trunk Diameter (cm per 1% increase)",
     y = NULL
   ) +
@@ -55,7 +54,7 @@ plot_3 <- tree_data_clean |>
   ungroup() |>
   ggplot(aes(x = dbh_trunk, fill = genus_name)) +
   geom_histogram(binwidth = 5, position = "identity", alpha = 0.6, color = "white") +
-  facet_wrap(~ genus_name) +
+  facet_wrap(~ genus_name, ncol = 4) +
   coord_cartesian(
     xlim = c(0, 100),
     ylim = c(0, 15000)
@@ -83,15 +82,13 @@ model_2_tidy <- tidy(model_2_excess, conf.int = TRUE) |>
     term_clean = c("Species Excess", "Genus Excess", "Family Excess")
   )
 
-# Coefficient Estimate Plot
 plot_4 <- ggplot(
   model_2_tidy, aes(x = estimate, y = reorder(term_clean, estimate))) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
   geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2, color = "#ff7f00", size = 0.8) +
   geom_point(size = 3.5, color = "#ff7f00") +
   labs(
-    title = "Model 2 Regression Coefficients (Predicting Mean DBH)",
-    subtitle = "Excess over 10-20-30 rule: Genus excess tracks aging trees, Family excess tracks small trees",
+    title = "Model 2 Regression Coefficients",
     x = "Effect on Mean Ward Trunk Diameter (cm per 1% excess increase)",
     y = NULL
   ) +
@@ -131,3 +128,25 @@ plot_5_family <- tree_data_clean |>
   )
 
 saveRDS(plot_5_family, file = here("models", "plot_5.rds"))
+
+#Model 1 and 2 Comparison Summary
+m1_stats <- glance(model_1_concentrations)
+m2_stats <- glance(model_2_excess)
+
+stats_comp <- data.frame(
+  Metric = c("R-Squared", "Adjusted R-Squared", "p-value", "Residual Std. Error"),
+  `Model 1` = c(
+    round(m1_stats$r.squared, 4),
+    round(m1_stats$adj.r.squared, 4),
+    round(m1_stats$p.value, 5),
+    round(m1_stats$sigma, 3)
+  ),
+  `Model 2` = c(
+    round(m2_stats$r.squared, 4),
+    round(m2_stats$adj.r.squared, 4),
+    round(m2_stats$p.value, 5),
+    round(m2_stats$sigma, 3)
+  )
+)
+
+saveRDS(stats_comp, file = here("models", "model_comparison.rds"))
