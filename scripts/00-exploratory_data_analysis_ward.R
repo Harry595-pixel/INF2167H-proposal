@@ -75,14 +75,38 @@ ward_metrics <- ward_counts |>
     )
   )
 
+#Format ward numbers
+ward_metrics <- ward_metrics[-nrow(ward_metrics), ]
+
+ward_metrics <- ward_metrics |>
+  mutate(ward = as.numeric(unlist(ward)))
+
+#Add ward name variable
+ward_metrics <- ward_metrics |>
+  left_join(
+    wards |>
+      select(`Ward Number`, `Ward Name`), 
+    by = c("ward" = "Ward Number")
+  ) |>
+  relocate(`Ward Name`, .after = ward) |>
+
+#Format ward name  
+ward_metrics <- ward_metrics |>
+  rename(ward_name = `Ward Name`)
+
+view(tree_data_clean)
+
 #Add region variable
+tree_data_clean <- tree_data_clean |>
+  mutate(ward = as.numeric(unlist(ward)))
+
 ward_metrics <- ward_metrics |>
   left_join(
     tree_data_clean |>
       distinct(ward, region), 
     by = "ward"
   ) |>
-  relocate(region, .after = ward)
+  relocate(region, .after = ward_name)
 
 view(ward_metrics)
 
