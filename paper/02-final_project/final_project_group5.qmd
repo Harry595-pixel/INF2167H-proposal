@@ -36,6 +36,8 @@ The street tree dataset used for this project is sourced from Toronto Open Data 
 
 The original dataset contains 16 variables, focusing on unique IDs, geographic location, tree type, and tree size. There is a total of 688,335 rows in the dataset.
 
+Ward names were sourced from Toronto Open Data's Ward Profiles dataset [@toronto_ward_profiles_2024]
+
 ## Data Cleaning
 
 A new dataset variable was created, called tree_data. This dataset only contains variables that were necessary for this project, including:
@@ -49,10 +51,12 @@ Another new dataset was created, called tree_data_clean. The janitor package [@R
 
 One of the focuses for this project is the 10-20-30 rule which requires the classification of the trees by species, genus, and family. Though species and genus may be inferred for some trees based on botanical name (e.g., if the botanical name is Acer Platanoides, the species is Acer Platanoides and the genus is Acer), the tree's family name must be identified using an external source. Thus, the World Flora Online (WFO) package [WorldFlora2020] was used to create the variables, species_name, genus_name, and family_name, based on the existing variable, botanical name. To optimize runtime, a new variable, called unique_trees, was created to identify all unique botanical names in the tree_data_clean dataset. This table had a total of 304 unique tree names. By running the WFO package's classification function on the unique_trees table instead of the tree_data_clean dataset, the function had to match 304 unique botanical names instead of matching names for each of the 688,335 tree entries individually, saving processing power and optimizing time efficiency.
 
-After the botanical names in unique_trees were classified (as the variable, taxonomy_extract), new variables in the tree_data_clean dataset were created for species_name, genus_name, and family_name. The left_join() function [@Wickham2019] was used to join the species, genus, and family names by the botanical_name variable present in both datasets. The results of the WFO matching were checked for missing values, and there were a total of 18 botanical names that the classification step was unable to classify.
+After the botanical names in unique_trees were classified (as the variable, taxonomy_extract), new variables in the tree_data_clean dataset were created for species_name, genus_name, and family_name. The left_join() function [@Wickham2019] was used to join the species, genus, and family names by the botanical_name variable present in both datasets. The results of the WFO matching were checked for missing values, and there were a total of 18 botanical names that the classification step was unable to classify (see Table 1).
 
 ```{r}
 #| echo: false
+#| tbl-cap: "Botanical names unidentified by WFO classification"
+
 missing_data_tab <- readRDS(here::here("models", "missing_data.rds"))
 missing_data_tab |> 
   kbl(booktabs = TRUE, longtable = TRUE) |> 
@@ -72,8 +76,12 @@ Exploratory data analysis was conducted to evaluate ward-level compliance to the
 
 ## Exploratory Data Analysis
 
+Exploratory data analysis was conducted to understand the general data patterns. The street tree data was grouped by ward to identify the dominant species, genus, and family of each ward (see Table 2). It was found that most wards had the same pattern in which the dominant species, genus, and family were Acer platanoides, Acer, and Sapindaceae respectively. The proportions of the largest species, genus, and family were then calculated. It was found that all wards violated the <10% species rule; 23 out of 25 wards violated the <20% genus rule; and 8 out of 25 wards violated the <30% family rule.
+
 ```{r}
 #| echo: false
+#| tbl-cap: "Dominant species, genus, and family names and proportions per ward"
+
 ward_data <- readRDS(here::here("models", "ward_table.rds"))@data
 ward_data |> 
   select(-total_trees_ward, -mean_dbh, -median_dbh, -sd_dbh) |>
@@ -87,9 +95,12 @@ ward_data |>
   column_spec(2:8, width = "1.6cm")
 ```
 
+In addition to ward-level compliance to the 10-20-30 rule, Table 3 was created as a summary of the size distribution of each ward, including number fo trees, mean diameter (DBH), median diameter (DBH), and standard deviation (DBH).
 
 ```{r}
 #| echo: false
+#| tbl-cap: "Summary of size distributions per ward"
+
 ward_data <- readRDS(here::here("models", "ward_table.rds"))@data
 ward_data |> 
   select(ward, ward_name, total_trees_ward, mean_dbh, median_dbh, sd_dbh) |>
@@ -106,25 +117,11 @@ ward_data |>
 
 ## Linear Regression Modelling
 
-```{r}
-#| fig-align: center
-#| fig.width: 6
-#| fig.height: 2.5
-#| echo: false
-plot_1 <- readRDS(here("models", "plot_1.rds"))
-plot_1
-```
+Two linear regression models were created to compare relationships between the 10-20-30 rule and tree size distributions. Model 1 was average diameter as a model of the percentage proportion of a ward's dominant species, genus, and family. Alternatively, Model 2 was average diameter as a model of the excess percentage points of a ward's dominant species, genus, and family. Comparing the models, Model 2 had higher R-squared and adjusted R-squared values, indicating a stronger model fit, and lower p-value and residual standard error, indicating higher statistical significance and lower error (see Table 4).
 
 ```{r}
-#| fig-align: center
-#| fig.width: 5.5
-#| fig.height: 2.5
 #| echo: false
-plot_4 <- readRDS(here("models", "plot_4.rds"))
-plot_4
-```
-```{r}
-#| echo: false
+#| tbl-cap: "Comparison of Models 1 and 2"
 
 comp_tab <- readRDS(here::here("models", "model_comparison.rds"))
 comp_tab |> 
@@ -138,8 +135,48 @@ comp_tab |>
   )
 ```
 
+Taking a look at Model 2's results in Table 5, the species term has a p-value greater than 0.05, indicating that it is statistically insignificant. However, both genus and family are statistically significant. The model demonstrates that:
+
+- for every 1 percentage point a ward exceeds the 20% genus threshold, the average trunk diameter increases by 0.90 cm; and
+
+- for every 1 percentage point a ward exceeds the 30% family threshold, the average trunk diameter decreases by ~2.03 cm.
+
+The results of Model 2 are shown in Figure 1.
+
+```{r}
+#| echo: false
+#| tbl-cap: "Model 2 Results"
+
+model_2 <- readRDS(here("models", "model_2.rds"))
+model_2 |> 
+  tidy() |>
+  kbl(booktabs = TRUE, longtable = TRUE) |> 
+  kable_styling(
+    latex_options = c("striped", "repeat_header"),
+    font_size = 8
+  )
+```
+
 ```{r}
 #| fig-align: center
+#| fig-cap: "Model 2 regression coefficients by species, genus, and family"
+#| fig.width: 5.5
+#| fig.height: 2.5
+#| echo: false
+plot_4 <- readRDS(here("models", "plot_4.rds"))
+plot_4
+```
+# Discussion
+
+Based on the relationship between average diameter and excess genus percentage points, Model 2 shows that wards with severe violation of the 20% genus rule rely heavily on larger, mature trees in their street tree population. This reflects the historical urban forestry practice of over-planting Acer, more commonly known as Maple trees.
+
+The trend of over-planting Acer trees is also evident in Figure 2. There are Acer trees of varying sizes, indicating that there are many older Acer trees that have survived to maturity as well as many young Acer trees that have been recently planted. In comparison, other genera have few to no mature trees, which could be explained by lower survival rates due to harsh weather and road conditions.
+
+Since other genera have low survivial rates, it is possible that the city has opted to plant more Acer trees knowing that Acer trees are more resilient to severe environmental conditions and have higher likelihood to reach maturity.
+
+```{r}
+#| fig-align: center
+#| fig-cap: "Size distribution of most planted genera"
 #| fig.width: 8
 #| fig.height: 8
 #| echo: false
@@ -147,9 +184,11 @@ comp_tab |>
 plot_3 <- readRDS(here("models", "plot_3.rds"))
 plot_3
 ```
+Conversely, Model 2 found that exceeding the 30% family threshold is associated with significantly smaller average trunk diameters. Though the Acer genus belongs within the Sapindaceae family, this pattern can be explained as recent mass planting of Sapindaceae trees that do not belong under the Acer genus. In Figure 3, there are multiple families with recent plantings, such as fabaceae, fagaceae, and rosaceae. However, sapindaceae still holds the largest proportion of the young tree population.
 
 ```{r}
 #| fig-align: center
+#| fig-cap: "Size distribution of most planted families"
 #| fig.width: 8
 #| fig.height: 8
 #| echo: false
@@ -158,6 +197,8 @@ plot_5 <- readRDS(here("models", "plot_5.rds"))
 plot_5
 ```
 
-# Discussion & Conclusion
+# Conclusion
+
+This study evaluated the health of Toronto’s street tree population by assessing adherence to the 10-20-30 rule against trunk diameter distributions across 25 municipal wards. The analysis confirmed severe taxonomic over-concentration, driven by a legacy of over-planting Acer species. Achieving a sustainable and resilient urban canopy will require the City of Toronto not only to restrict further over-planting of dominant genera, but also to prioritize long-term care and survival strategies for non-dominant species as they grow toward maturity.
 
 # References
